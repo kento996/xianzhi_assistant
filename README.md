@@ -9,7 +9,7 @@ llm快速筛选到有用的文章并生成一个结果
 ## 使用方式
 1. 在env中填写gemini api：
 ```bash
-GOOGLE_API_KEY = AIzaSyA9cKkm4U65BPksk-pVgHmclb3FGvhVZwk
+GOOGLE_API_KEY = AIzaSyA9cKkm4U65BPksk-pVgHmclxxxxxxxxxxx
 ```
 2. 在DocumentStore中补充相应范围的先知社区文章,详细的先知文章参考范围参见`xianzhi_index.json`
 ### 示例
