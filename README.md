@@ -7,14 +7,30 @@ llm快速筛选到有用的文章并生成一个结果
 ## 文章目录
 知识库的文章构建范围为：7023～12923，共计2898篇
 ## 使用方式
-1. 在env中填写gemini api：
-```bash
+xianzhi_assistant有两种使用方式，用户可以按照知识库构建范围
+在本地接入先知社区的文章，也可以使用url模式。
+
+
+在env中填写gemini api：
+```
 GOOGLE_API_KEY = AIzaSyA9cKkm4U65BPksk-pVgHmclxxxxxxxxxxx
 ```
-2. 在DocumentStore中补充相应范围的先知社区文章,详细的先知文章参考范围参见`xianzhi_index.json`
+### 本地模式
+在DocumentStore中补充相应范围的先知社区文章,详细的先知文章参考范围参见`xianzhi_index.json`。
+在DocumentStore文件夹下，新建xianzhi文件夹并将各位爬取的文章放入即可
+
+然后按照如下方式调用即可：
+```
+python main.py --type "local" --question "k8s存在哪些漏洞" --num 3                                              
+```
+### URL模式
+直接运行：
+```
+python main.py --type "url" --question "k8s存在哪些漏洞" --num 3                                              
+```
 ### 示例
 - 问题：k8s存在哪些漏洞
-```bash
+```
 ['https://xz.aliyun.com/t/12437', 'https://xz.aliyun.com/t/12055', 'https://xz.aliyun.com/t/11138', 'https://xz.aliyun.com/t/8000', 'https://xz.aliyun.com/t/11890']
 ## 分析安全问题
 

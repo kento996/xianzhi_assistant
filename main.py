@@ -1,7 +1,9 @@
+import argparse
 import re
 
 from src.chains import Chains_Gemini
 from src.llm import get_gemini_pro
+from src.utils import documentScapy
 from src.vectorstore import query_vectordb
 
 def search_document(llm,chains,question:str,k:int=5):
@@ -10,7 +12,7 @@ def search_document(llm,chains,question:str,k:int=5):
     ans=query_vectordb(abstract_content,k)
     return ans
 
-def resCollection(chains,ans):
+def resCollection(chains,ans,question):
     res_org = []
     fileNames=[]
     pattern = r"^\d+"
@@ -24,18 +26,56 @@ def resCollection(chains,ans):
         res_deal += f"###参考答案{index + 1}" + "\n" + i.replace("\n", " ") + "\n"
     return res_deal,fileNames
 
+def anaylzeResultByUrl(chains,llm,question,fileNames:list):
+    res_org=[]
+    for fileName in fileNames:
+        content_page=documentScapy(fileName)
+        chain=chains.analyzeResult_PromptTemplate | llm
+        res=chain.invoke({"question":question,"contents":content_page}).content
+        res_org.append(res)
+    res_deal = ""
+    for index, i in enumerate(res_org):
+        res_deal += f"###参考答案{index + 1}" + "\n" + i.replace("\n", " ") + "\n"
+    # print(res_deal)
+    return res_deal
+
 def anaylzeResult(chains,res_collection,question):
     return chains.analyze_chain(question=question,contents=res_collection)
 
-if __name__ == '__main__':
-    question="k8s存在哪些漏洞"
-    llm=get_gemini_pro()
+def local_store(question:str,k:int=5):
+    llm = get_gemini_pro()
     chains = Chains_Gemini()
-    ans = search_document(llm,chains,question, k=5)
-    res_collection,fileNames= resCollection(chains, ans)
-    res=anaylzeResult(chains,res_collection,question)
+    ans = search_document(llm, chains, question, k)
+    res_collection, fileNames = resCollection(chains, ans,question)
+    res = anaylzeResult(chains, res_collection, question)
     print(fileNames)
     print(res)
+
+def url_store(question:str,k:int=5):
+    llm = get_gemini_pro()
+    chains = Chains_Gemini()
+    ans = search_document(llm, chains, question, k)
+    _, fileNames = resCollection(chains, ans,question)
+    res_collection=anaylzeResultByUrl(chains=chains,llm=llm,question=question,fileNames=fileNames)
+    res = anaylzeResult(chains, res_collection, question)
+    print(fileNames)
+    print(res)
+
+
+
+if __name__ == '__main__':
+    parser = argparse.ArgumentParser(description='Process questions and store them locally or via URL')
+    parser.add_argument('--type', required=True, choices=['local', 'url'], help='Choose storage type: local or url')
+    parser.add_argument('--question', required=True, type=str, help='Question to store')
+    parser.add_argument('--num', type=int, default=5, help='Number (default: 5)')
+
+    args = parser.parse_args()
+
+    if args.type == 'local':
+        local_store(args.question, args.num)
+    elif args.type == 'url':
+        url_store(args.question, args.num)
+
 
 
 

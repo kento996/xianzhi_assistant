@@ -1,4 +1,6 @@
 from PyPDF2 import PdfReader
+from langchain_community.document_loaders import AsyncChromiumLoader
+from langchain_community.document_transformers import BeautifulSoupTransformer
 from langchain_text_splitters import RecursiveCharacterTextSplitter
 
 
@@ -21,3 +23,13 @@ def get_text_chunks(
             length_function=len
         )
         return text_splitter.split_text(text)
+
+def documentScapy(url):
+    urls=[]
+    urls.append(url)
+    loader = AsyncChromiumLoader(urls)
+    html = loader.load()
+    bs_transformer = BeautifulSoupTransformer()
+    docs_transformed = bs_transformer.transform_documents(html, tags_to_extract=["p"])
+
+    return docs_transformed[0].page_content
