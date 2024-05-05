@@ -28,6 +28,12 @@ python main.py --type "local" --question "k8s存在哪些漏洞" --num 3
 ```
 python main.py --type "url" --question "k8s存在哪些漏洞" --num 3                                              
 ```
+### 更新知识库
+用户可以通过`--update`参数指定自己本地的wp地址用于更新知识库中的文章
+```
+python main.py --update "xxxxxxx"                                              
+
+```
 ### 示例
 - 问题：k8s存在哪些漏洞
 ```
