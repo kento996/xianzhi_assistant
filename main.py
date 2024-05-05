@@ -4,7 +4,8 @@ import re
 from src.chains import Chains_Gemini
 from src.llm import get_gemini_pro
 from src.utils import documentScapy
-from src.vectorstore import query_vectordb
+from src.vectorstore import query_vectordb, update_vectordb
+
 
 def search_document(llm,chains,question:str,k:int=5):
     content = llm.invoke(question).content
@@ -65,16 +66,26 @@ def url_store(question:str,k:int=5):
 
 if __name__ == '__main__':
     parser = argparse.ArgumentParser(description='Process questions and store them locally or via URL')
-    parser.add_argument('--type', required=True, choices=['local', 'url'], help='Choose storage type: local or url')
-    parser.add_argument('--question', required=True, type=str, help='Question to store')
+    parser.add_argument('--type', choices=['local', 'url'], help='Choose storage type: local or url')
+    parser.add_argument('--question', type=str, help='Question to store')
     parser.add_argument('--num', type=int, default=5, help='Number (default: 5)')
+    parser.add_argument('--update', type=str, help='Enter the pdf folder you want to add')
 
     args = parser.parse_args()
 
-    if args.type == 'local':
-        local_store(args.question, args.num)
-    elif args.type == 'url':
-        url_store(args.question, args.num)
+    if args.type !=None:
+        match args.type:
+            case 'url':
+                url_store(args.question, args.num)
+            case 'local':
+                local_store(args.question, args.num)
+    elif args.type == None:
+        update_vectordb(args.update)
+
+
+
+
+
 
 
 
