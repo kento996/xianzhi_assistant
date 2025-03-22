@@ -73,3 +73,188 @@ Kubernetes（k8s）是一个开源容器编排系统，它存在以下漏洞：
 ```
 ## 注意
 本项目仅做研究使用，切勿用于任何违法行为
+
+# XianzhiAsistant
+
+XianzhiAsistant是一个用于网络安全领域问题处理的助手工具，能够根据问题搜索相关文档并生成回答。
+
+## 特性
+
+- 支持多种模型提供商：Gemini、OpenAI、Ollama
+- 通过.env文件灵活配置模型提供商、模型名称和API密钥
+- 支持本地存储和URL查询
+- 自动提取和分析文档内容
+- 根据问题搜索最相关的文档
+- 生成综合分析结果
+
+## 环境要求
+
+- Python 3.8+
+- 安装requirements.txt中的依赖
+
+## 安装
+
+1. 克隆仓库：
+```bash
+git clone https://github.com/yourusername/XianzhiAsistant.git
+cd XianzhiAsistant
+```
+
+2. 安装依赖：
+```bash
+pip install -r requirements.txt
+```
+
+3. 配置环境变量：
+
+   拷贝示例环境变量文件：
+   ```bash
+   cp .env.example .env
+   ```
+   
+   根据需要编辑.env文件：
+   ```
+   # API密钥配置
+   GOOGLE_API_KEY=your_google_api_key_here
+   OPENAI_API_KEY=your_openai_api_key_here
+   
+   # 默认模型配置
+   DEFAULT_MODEL_PROVIDER=gemini  # 可选: gemini, openai, ollama
+   DEFAULT_MODEL_NAME=  # 为空时使用各提供商的默认模型
+   
+   # Gemini模型配置
+   DEFAULT_GEMINI_MODEL=gemini-pro  # 可选: gemini-pro, gemini-1.5-pro-latest等
+   DEFAULT_GEMINI_EMBEDDING_MODEL=models/embedding-001  # Gemini嵌入模型
+   
+   # OpenAI模型配置 
+   DEFAULT_OPENAI_MODEL=gpt-3.5-turbo  # 可选: gpt-3.5-turbo, gpt-4, gpt-4-turbo等
+   DEFAULT_OPENAI_EMBEDDING_MODEL=text-embedding-ada-002  # OpenAI嵌入模型
+   
+   # Ollama模型配置
+   OLLAMA_BASE_URL=http://localhost:11434  # Ollama服务URL
+   DEFAULT_OLLAMA_MODEL=llama2  # 可选: llama2, llama3, mistral等
+   
+   # 向量库配置
+   DEFAULT_VECTOR_DB_DIR=vectorStore  # 向量库目录
+   DEFAULT_NUM_RESULTS=5  # 默认查询结果数
+   ```
+
+## 配置说明
+
+通过.env文件，您可以灵活配置所有模型参数：
+
+| 环境变量 | 说明 | 默认值 |
+|---------|------|--------|
+| GOOGLE_API_KEY | Google API密钥 | 无 |
+| OPENAI_API_KEY | OpenAI API密钥 | 无 |
+| DEFAULT_MODEL_PROVIDER | 默认模型提供商 | gemini |
+| DEFAULT_MODEL_NAME | 通用默认模型名称 | 无 |
+| DEFAULT_GEMINI_MODEL | Gemini模型名称 | gemini-pro |
+| DEFAULT_GEMINI_EMBEDDING_MODEL | Gemini嵌入模型 | models/embedding-001 |
+| DEFAULT_OPENAI_MODEL | OpenAI模型名称 | gpt-3.5-turbo |
+| DEFAULT_OPENAI_EMBEDDING_MODEL | OpenAI嵌入模型 | text-embedding-ada-002 |
+| OLLAMA_BASE_URL | Ollama服务地址 | http://localhost:11434 |
+| DEFAULT_OLLAMA_MODEL | Ollama模型名称 | llama2 |
+| DEFAULT_VECTOR_DB_DIR | 向量库存储目录 | vectorStore |
+| DEFAULT_NUM_RESULTS | 默认查询结果数量 | 5 |
+
+### 模型配置优先级
+
+模型选择的优先级从高到低:
+1. 命令行参数 (--model, --model_name)
+2. 环境变量 DEFAULT_MODEL_NAME
+3. 提供商特定的环境变量 (DEFAULT_GEMINI_MODEL, DEFAULT_OPENAI_MODEL, DEFAULT_OLLAMA_MODEL)
+4. 代码内置默认值
+
+### 特定模型配置示例
+
+#### Gemini配置示例
+```
+DEFAULT_MODEL_PROVIDER=gemini
+DEFAULT_GEMINI_MODEL=gemini-1.5-pro-latest  # 使用1.5版本
+```
+
+#### OpenAI配置示例
+```
+DEFAULT_MODEL_PROVIDER=openai
+DEFAULT_OPENAI_MODEL=gpt-4-turbo  # 使用GPT-4 Turbo
+```
+
+#### Ollama配置示例
+```
+DEFAULT_MODEL_PROVIDER=ollama
+DEFAULT_OLLAMA_MODEL=llama3  # 使用Llama 3
+OLLAMA_BASE_URL=http://192.168.1.100:11434  # 自定义Ollama服务地址
+```
+
+## 使用方法
+
+### 更新向量库
+
+将PDF文档添加到向量库中：
+
+```bash
+python main.py --update /path/to/pdf/folder
+```
+
+这将使用.env文件中配置的默认模型提供商和模型名称。也可以在命令行指定：
+
+```bash
+python main.py --update /path/to/pdf/folder --model openai --model_name gpt-4
+```
+
+### 查询问题
+
+使用本地存储查询，使用.env中配置的默认模型：
+
+```bash
+python main.py --type local --question "你的问题"
+```
+
+使用URL查询，覆盖.env中的默认配置：
+
+```bash
+python main.py --type url --question "你的问题" --num 10 --model openai --model_name gpt-4
+```
+
+## 参数说明
+
+- `--type`: 查询类型，可选`local`或`url`
+- `--question`: 要查询的问题
+- `--num`: 返回的相似文档数量，未指定时使用.env中的配置
+- `--update`: 要添加的PDF文件夹路径
+- `--model`: 模型提供商，可选`gemini`, `openai`或`ollama`，未指定时使用.env中的配置
+- `--model_name`: 指定模型名称，未指定时使用.env中的配置
+
+## Ollama模型使用
+
+要使用Ollama模型：
+
+1. 从[Ollama官网](https://ollama.ai/)下载并安装Ollama
+2. 拉取您想要使用的模型：
+```bash
+ollama pull llama2
+```
+3. 运行Ollama服务
+4. 在.env文件中设置：
+```
+DEFAULT_MODEL_PROVIDER=ollama
+DEFAULT_OLLAMA_MODEL=llama2  # 或您拉取的其他模型
+OLLAMA_BASE_URL=http://localhost:11434  # 如果服务不在默认地址
+```
+
+## OpenAI模型使用
+
+要使用OpenAI模型：
+1. 在.env文件中设置您的API密钥：
+```
+OPENAI_API_KEY=your_openai_api_key
+DEFAULT_MODEL_PROVIDER=openai
+DEFAULT_OPENAI_MODEL=gpt-4  # 或其他模型，如gpt-3.5-turbo
+```
+
+## 注意事项
+
+- 对于Ollama模型，确保Ollama服务已在本地运行
+- 对于OpenAI和Google Gemini模型，确保已设置正确的API密钥
+- 向量库存储在不同的目录中，每个模型提供商有自己的向量库

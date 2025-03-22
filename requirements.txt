@@ -25,12 +25,15 @@ jsonpointer==2.4
 langchain-community==0.0.38
 langchain-core==0.1.52
 langchain-google-genai==1.0.3
+langchain-openai==0.1.1
 langchain-text-splitters==0.0.1
 langsmith==0.1.57
 marshmallow==3.21.2
 multidict==6.0.5
 mypy-extensions==1.0.0
 numpy==1.26.4
+ollama==0.1.6
+openai==1.13.3
 orjson==3.10.3
 packaging==23.2
 proto-plus==1.23.0
