@@ -4,7 +4,7 @@ annotated-types==0.6.0
 async-timeout==4.0.3
 attrs==23.2.0
 cachetools==5.3.3
-certifi==2024.2.2
+certifi==2024.7.4
 charset-normalizer==3.3.2
 dataclasses-json==0.6.6
 frozenlist==1.4.1
