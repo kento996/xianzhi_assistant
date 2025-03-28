@@ -9,6 +9,7 @@ from src.chains import Chains
 from src.llm import get_llm
 from src.utils import documentScapy
 from src.vectorstore import query_vectordb, update_vectordb
+from src.agent import create_agent
 
 # 配置日志
 logging.basicConfig(level=logging.INFO, format='%(asctime)s - %(name)s - %(levelname)s - %(message)s')
@@ -239,12 +240,14 @@ if __name__ == '__main__':
         parser.add_argument('--update', type=str, help='要添加的PDF文件夹路径')
         parser.add_argument('--model', choices=['gemini', 'openai', 'ollama'], help=f'选择模型提供商: gemini, openai或ollama (默认: {DEFAULT_MODEL_PROVIDER})')
         parser.add_argument('--model_name', type=str, help='指定模型名称，默认使用.env中配置值')
+        # 创建agent开放工具权限列表
+        parser.add_argument('--call_function', choices=['SearchWeb', 'ReadWebPage', 'CVEQuery'], help='调用Agent执行的工具名，例如: SearchWeb, ReadWebPage, CVEQuery')
 
         args = parser.parse_args()
         logger.info(f"命令行参数: {args}")
 
         if args.type is not None:
-            if not args.question:
+            if not args.question: 
                 error_msg = "错误: 必须提供--question参数"
                 logger.error(error_msg)
                 print(error_msg)
@@ -267,6 +270,21 @@ if __name__ == '__main__':
             
             logger.info(f"更新向量库 - 路径: {args.update}, 模型: {model_provider or DEFAULT_MODEL_PROVIDER}/{model_name or DEFAULT_MODEL_NAME or '默认'}")
             update_vectordb(args.update, model_provider, model_name)
+        # 实现agent工具调用功能
+        elif args.call_function is not None:
+            logger.info(f"调用Agent工具: {args.call_function}")
+            agent = create_agent(
+                tool_name=args.call_function,
+                model_provider=args.model or DEFAULT_MODEL_PROVIDER,
+                model_name=args.model_name or DEFAULT_MODEL_NAME
+            )
+            if not args.question:
+                print("错误：使用 --call_function 时必须提供 --question 参数作为输入。")
+                sys.exit(1)
+
+            result = agent.run(args.question)
+            print("Agent响应：", result)
+
         else:
             logger.info("未提供操作参数，显示帮助信息")
             parser.print_help()

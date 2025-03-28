@@ -206,7 +206,3 @@ if __name__ == '__main__':
         model_provider = sys.argv[2] if len(sys.argv) > 2 else None
         model_name = sys.argv[3] if len(sys.argv) > 3 else None
         update_vectordb(pdf_dir, model_provider, model_name)
-
-
-
-
