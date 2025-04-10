@@ -47,7 +47,7 @@ pyparsing==3.1.2
 PyPDF2==3.0.1
 python-dotenv==1.0.1
 PyYAML==6.0.1
-requests==2.31.0
+requests==2.32.0
 rsa==4.9
 SQLAlchemy==2.0.30
 tenacity==8.3.0
